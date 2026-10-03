@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "C/C++: prepare source list",
+            "type": "process",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$files = @(Get-ChildItem -LiteralPath '${workspaceFolder}' -Filter '*.cpp' -File); if ($files.Count -eq 0) { Write-Error 'No .cpp files found.'; exit 1 }; $lines = foreach ($f in $files) { '\"' + $f.FullName + '\"' }; $rsp = Join-Path $env:TEMP 'vscode_cpp_sources.rsp'; [System.IO.File]::WriteAllLines($rsp, $lines, [System.Text.Encoding]::ASCII)"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-std=c++20",
+                "-g",
+                "@${env:TEMP}\\vscode_cpp_sources.rsp",
+                "-o",
+                "${workspaceFolder}\\main.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "C/C++: prepare source list",
+            "dependsOrder": "sequence",
+            "detail": "Build all C++ source files in the project."
+        }
+    ]
+}
